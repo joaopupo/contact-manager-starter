@@ -34,4 +34,3 @@ public class ContactManager {
         return String.format("%s-%s", contact.getFirstName(), contact.getLastName());
     }
 }
-
