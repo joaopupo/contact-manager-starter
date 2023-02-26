@@ -1,15 +1,32 @@
 package com.programming.techie;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ContactManagerTest {
+/**  Junit instantiates the Test class for each method marked with @Test. So,
+ *  @BeforeAll and @AfterAll, should be marked with static. However, this behavior could be
+ *  changed, by instructing Junit to create an instance of the Test class using @TestInstance.
+**/
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ContactManagerTest {
+
+    private ContactManager contactManager;
+
+    @BeforeAll
+    public void setupAll() {
+        System.out.println("Should Print Before All Tests");
+    }
+
+    @BeforeEach
+    public void setupA() {
+        System.out.println("\nShould Print Before Each Tests");
+        contactManager = new ContactManager();
+    }
 
     @Test
     @DisplayName("Should Create Contact")
      void shouldCreateContact() {
-        ContactManager contactManager = new ContactManager();
         contactManager.addContact("John", "Doe", "0123456789");
         assertFalse(contactManager.getAllContacts().isEmpty());
         assertEquals(1, contactManager.getAllContacts().size());
@@ -24,7 +41,6 @@ public class ContactManagerTest {
     @Test
     @DisplayName("Should Not Create Contact When First Name is Null")
     public void shouldThrowRuntimeExceptionWhenFirstNameIsNull() {
-        ContactManager contactManager = new ContactManager();
         assertThrows(RuntimeException.class, () -> {
             contactManager.addContact(null, "Doe", "0123456789");
         });
@@ -33,7 +49,6 @@ public class ContactManagerTest {
     @Test
     @DisplayName("Should Not Create Contact When Last Name is Null")
     public void shouldThrowRuntimeExceptionWhenLastNameIsNull() {
-        ContactManager contactManager = new ContactManager();
         assertThrows(RuntimeException.class, () -> {
             contactManager.addContact("John", null, "0123456789");
         });
@@ -42,9 +57,20 @@ public class ContactManagerTest {
     @Test
     @DisplayName("Should Not Create Contact When Phone Number is Null")
     public void shouldThrowRuntimeExceptionWhenPhoneNumberIsNull() {
-        ContactManager contactManager = new ContactManager();
         assertThrows(RuntimeException.class, () -> {
             contactManager.addContact("John", "Doe", null);
         });
     }
+
+    @AfterEach
+    public void tearDown() throws InterruptedException {
+        System.out.println("Should Print After Each Tests");
+    }
+
+    @AfterAll
+    public void tearDownAll() {
+        contactManager = new ContactManager();
+        System.out.println("\nShould Print After All Tests");
+    }
+
 }
