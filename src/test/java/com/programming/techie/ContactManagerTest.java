@@ -1,12 +1,15 @@
 /**
- * Implementation 4
- * Assumptions
- * @RepeatedTest/@ParameterizedTest/@ValueTest/@MethodSource
- * @CsvSource/@FileSource
+ * Implementation 5
+ *
+ * Disable Tests (@Disable)
+ *
+ * @Nested) - to organize tests into Nested Tests
+ * In nested classes we are not allowed to use static members.
+ * So, we can´t use @BeforeAll and @AfterAll annotations without
+ * changing the instance life cycle, with the @TestInstance annotation of line 26.
  */
 
 package com.programming.techie;
-
 
 import java.util.List;
 import java.util.Arrays;
@@ -129,68 +132,76 @@ class ContactManagerTest {
         assertEquals(1, contactManager.getAllContacts().size());
     }
 
+    @Nested
+    class RepeatedNestTest {
 
-    @DisplayName("Repeated Contact Creation Test 5 Times")
-    @RepeatedTest(5)
-    public void shouldTestContactsRepeatedly() {
-        contactManager.addContact("John", "Doe", "0123456789");
-        assertFalse(contactManager.getAllContacts().isEmpty());
-        assertEquals(1, contactManager.getAllContacts().size());
+        @DisplayName("Repeated Contact Creation Test 5 Times")
+        @RepeatedTest(5)
+        public void shouldTestContactsRepeatedly() {
+            contactManager.addContact("John", "Doe", "0123456789");
+            assertFalse(contactManager.getAllContacts().isEmpty());
+            assertEquals(1, contactManager.getAllContacts().size());
+        }
+
+        @DisplayName("Repeated Contact Creation Test 5 Times")
+        @RepeatedTest(value = 5,
+                name = "Repeating Contact Creation Test {currentRepetition} of {totalRepetitions}")
+        public void shouldTestContactRepeatedly() {
+            contactManager.addContact("John", "Doe", "0123456789");
+            assertFalse(contactManager.getAllContacts().isEmpty());
+            assertEquals(1, contactManager.getAllContacts().size());
+        }
+
     }
 
-    @DisplayName("Repeated Contact Creation Test 5 Times")
-    @RepeatedTest(value = 5,
-            name = "Repeating Contact Creation Test {currentRepetition} of {totalRepetitions}")
-    public void shouldTestContactRepeatedly() {
-        contactManager.addContact("John", "Doe", "0123456789");
-        assertFalse(contactManager.getAllContacts().isEmpty());
-        assertEquals(1, contactManager.getAllContacts().size());
-    }
+    @Nested
+    class ParameterizedNestedTest {
 
-    @DisplayName("Repeated Contact Creation Test 5 Times")
-    @ParameterizedTest
-    @ValueSource(strings = {"0123456789", "0123456789", "0123456789"})
-    /** The Test verifies whether the Phone Number starts with 0 or not. As we provided
-     * invalid inputs for the 2nd and 3rd cases, the tests failed.
-     */
-    public void shouldTestContactCreationUsingValueSource(String phoneNumber) {
-        contactManager.addContact("John", "Doe", phoneNumber);
-        assertFalse(contactManager.getAllContacts().isEmpty());
-        assertEquals(1, contactManager.getAllContacts().size());
-    }
+        @DisplayName("Repeated Contact Creation Test 5 Times")
+        @ParameterizedTest
+        @ValueSource(strings = {"0123456789", "0123456789", "0123456789"})
+        /** The Test verifies whether the Phone Number starts with 0 or not. As we provided
+         * invalid inputs for the 2nd and 3rd cases, the tests failed.
+         */
+        public void shouldTestContactCreationUsingValueSource(String phoneNumber) {
+            contactManager.addContact("John", "Doe", phoneNumber);
+            assertFalse(contactManager.getAllContacts().isEmpty());
+            assertEquals(1, contactManager.getAllContacts().size());
+        }
 
-    @DisplayName("Test Disabled")
-    @ParameterizedTest
-    @MethodSource("PhoneNumberList")
-    @Disabled   // to prevent a test from run.
-    public void shouldTestPhoneNumberFormatUsingMethodSource(String phoneNumber) {
-        contactManager.addContact("John", "Doe", phoneNumber);
-        assertFalse(contactManager.getAllContacts().isEmpty());
-        assertEquals(1, contactManager.getAllContacts().size());
-    }
+        @DisplayName("Test Disabled")
+        @ParameterizedTest
+        @MethodSource("PhoneNumberList")
+        @Disabled   // to prevent a test from run.
+        public void shouldTestPhoneNumberFormatUsingMethodSource(String phoneNumber) {
+            contactManager.addContact("John", "Doe", phoneNumber);
+            assertFalse(contactManager.getAllContacts().isEmpty());
+            assertEquals(1, contactManager.getAllContacts().size());
+        }
 
-    private List<String> phoneNumberList() {
-        return Arrays.asList("0123456789", "0987654321", "0123654789");
-    }
+        private List<String> phoneNumberList() {
+            return Arrays.asList("0123456789", "0987654321", "0123654789");
+        }
 
-    @DisplayName("CSV () Source Case - Phone numbers should match the required format.")
-    @ParameterizedTest
-    @CsvSource({"0123456789", "0123456789","0123456789"})    // It could be: @CsvFileSource(resources = "/data.csv")
-    public void shouldTestPhoneNumberFormatUsingCSVSource(String phoneNumber) {
-        contactManager.addContact("John", "Doe", phoneNumber);
-        assertFalse(contactManager.getAllContacts().isEmpty());
-        assertEquals(1, contactManager.getAllContacts().size());
-    }
+        @DisplayName("CSV () Source Case - Phone numbers should match the required format.")
+        @ParameterizedTest
+        @CsvSource({"0123456789", "0123456789","0123456789"})    // It could be: @CsvFileSource(resources = "/data.csv")
+        public void shouldTestPhoneNumberFormatUsingCSVSource(String phoneNumber) {
+            contactManager.addContact("John", "Doe", phoneNumber);
+            assertFalse(contactManager.getAllContacts().isEmpty());
+            assertEquals(1, contactManager.getAllContacts().size());
+        }
 
-    @DisplayName("CSV File Source Case - Phone numbers should match the required format.")
-    @ParameterizedTest
-    @CsvFileSource(resources = "/data.csv")    // It could be: @CsvFileSource(resources = "/data.csv")
+        @DisplayName("CSV File Source Case - Phone numbers should match the required format.")
+        @ParameterizedTest
+        @CsvFileSource(resources = "/data.csv")    // It could be: @CsvFileSource(resources = "/data.csv")
         // the csv file is usually created in the resources folder. The path is: ...\test\resources\data.csv
-    public void shouldTestPhoneNumberFormatUsingCSVFileSource(String phoneNumber) {
-        contactManager.addContact("John", "Doe", phoneNumber);
-        assertFalse(contactManager.getAllContacts().isEmpty());
-        assertEquals(1, contactManager.getAllContacts().size());
+        public void shouldTestPhoneNumberFormatUsingCSVFileSource(String phoneNumber) {
+            contactManager.addContact("John", "Doe", phoneNumber);
+            assertFalse(contactManager.getAllContacts().isEmpty());
+            assertEquals(1, contactManager.getAllContacts().size());
+        }
+
     }
 
 }
-
