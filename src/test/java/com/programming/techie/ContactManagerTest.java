@@ -1,22 +1,22 @@
 /**
- * Implementation 3
- * Conditional Executions: @EnabledOnOs and @DisabledOnOs
- * SO - Windows 11
+ * Implementation 4
+ * Assumptions, @RepeatedTest and @ParameterizedTest/@ValueTest/@MethodSource/@CsvSource/@FileSource
  */
 
 package com.programming.techie;
 
+import java.util.List;
+import java.util.Arrays;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.condition.OS;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- *  Junit instantiates the Test class for each method marked with @Test. So,
- *  @BeforeAll and @AfterAll, should be marked with static. However, this behavior could be
- *  changed, by instructing Junit to create an instance of the Test class using @TestInstance.
-**/
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContactManagerTest {
 
@@ -29,7 +29,7 @@ class ContactManagerTest {
 
     @BeforeEach
     public void setup() {
-        System.out.println("\nShould Print Before Each Test");
+        System.out.println("\nInstanciating Contact Manager");
         contactManager = new ContactManager();
     }
 
@@ -74,6 +74,7 @@ class ContactManagerTest {
     @AfterEach
     public void tearDown() throws InterruptedException {
         System.out.println("Should Print After Each Test");
+
     }
 
     @AfterAll
@@ -111,29 +112,70 @@ class ContactManagerTest {
                 .isPresent());
     }
 
+    @Test
+    @DisplayName("Test Contact Creation on Developer Machine")
+    public void shouldTestContactCreationOnDEV() {
+        Assumptions.assumeTrue("DEV".equals(System.getProperty("ENV")));
+        /** Edit the run configuration and,in VM (Alt+V) add the property "-DENV=DEV".
+         * if you put, for instance, "TEST", in place os "DEV", without change the proprerty,
+         * the test pass but the print will report "Assumption failed: assumption is not true"".
+         */
+        contactManager.addContact("John", "Doe", "0123456789");
+        assertFalse(contactManager.getAllContacts().isEmpty());
+        assertEquals(1, contactManager.getAllContacts().size());
+    }
+
+
+    @DisplayName("Repeated Contact Creation Test 5 Times")
+    @RepeatedTest(5)
+    public void shouldTestContactsRepeatedly() {
+        contactManager.addContact("John", "Doe", "0123456789");
+        assertFalse(contactManager.getAllContacts().isEmpty());
+        assertEquals(1, contactManager.getAllContacts().size());
+    }
+
+    @DisplayName("Repeated Contact Creation Test 5 Times")
+    @RepeatedTest(value = 5,
+            name = "Repeating Contact Creation Test {currentRepetition} of {totalRepetitions}")
+    public void shouldTestContactRepeatedly() {
+        contactManager.addContact("John", "Doe", "0123456789");
+        assertFalse(contactManager.getAllContacts().isEmpty());
+        assertEquals(1, contactManager.getAllContacts().size());
+    }
+
+    @DisplayName("Repeated Contact Creation Test 5 Times")
+    @ParameterizedTest
+    @ValueSource(strings = {"0123456789", "1234567890", "+0123456789"})
+    /** The Test verifies whether the Phone Number starts with 0 or not, as we provided
+     * invalid inputs for the 2nd and 3rd cases, the tests failed.
+     */
+    public void shouldTestContactCreationUsingValueSource(String phoneNumber) {
+        contactManager.addContact("John", "Doe", phoneNumber);
+        assertFalse(contactManager.getAllContacts().isEmpty());
+        assertEquals(1, contactManager.getAllContacts().size());
+    }
+
+    @DisplayName("Repeated Contact Creation Test 5 Times")
+    @ParameterizedTest
+    @MethodSource("PhoneNumberList")
+    public void shouldTestPhoneNumberFormatUsingMethodSource(String phoneNumber) {
+        contactManager.addContact("John", "Doe", phoneNumber);
+        assertFalse(contactManager.getAllContacts().isEmpty());
+        assertEquals(1, contactManager.getAllContacts().size());
+    }
+
+    private List<String> phoneNumberList() {
+        return Arrays.asList("0123456789", "1234567890", "+0123456789");
+    }
+
+    @DisplayName("Repeated Contact Creation Test 5 Times")
+    @ParameterizedTest
+    @CsvSource({"1,0123456789", "2,1234567890","3,+0123456789"})    // It could be: @CsvFileSource(resources = "/data.csv")
+    public void shouldTestPhoneNumberFormatUsingCSVSource(String phoneNumber) {
+        contactManager.addContact("John", "Doe", phoneNumber);
+        assertFalse(contactManager.getAllContacts().isEmpty());
+        assertEquals(1, contactManager.getAllContacts().size());
+    }
+
 }
 
-/** Result:
- *
- Should Print Before All Tests
-
- Disabled on operating system: Windows 11 ==> Should run only on MAC OS
-
- Should Print Before Each Test
- Should Print After Each Test
-
- Should Print Before Each Test
- Should Print After Each Test
-
- Should Print Before Each Test
- Should Print After Each Test
-
- Disabled on operating system: Windows 11 ==> Disabled on WINDOWS OS
-
- Should Print Before Each Test
- Should Print After Each Test
-
- Should Print After All Tests
-
- Process finished with exit code 0
- */
